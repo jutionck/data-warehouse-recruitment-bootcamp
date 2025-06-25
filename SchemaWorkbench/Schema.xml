@@ -1,0 +1,81 @@
+<Schema name="recruitment_olap">
+
+  <Dimension type="StandardDimension" visible="true" name="Candidate Dimension">
+    <Hierarchy name="Candidate Hierarchy" visible="true" hasAll="true" primaryKey="candidate_id">
+      <Table name="dim_candidate"/>
+      <Level name="Gender" visible="true" column="gender" type="String" uniqueMembers="false"/>
+      <Level name="School" visible="true" column="school" type="String" uniqueMembers="false"/>
+      <Level name="Major" visible="true" column="majoring" type="String" uniqueMembers="false"/>
+      <Level name="Fullname" visible="true" column="fullname" type="String" uniqueMembers="false"/>
+    </Hierarchy>
+  </Dimension>
+
+  <Dimension type="StandardDimension" visible="true" name="Location Dimension">
+    <Hierarchy name="Location Hierarchy" visible="true" hasAll="true" primaryKey="location_id">
+      <Table name="dim_location"/>
+      <Level name="Province" visible="true" column="province_origin" type="String" uniqueMembers="false"/>
+      <Level name="Town" visible="true" column="town_origin" type="String" uniqueMembers="false"/>
+      <Level name="Training Center" visible="true" column="training_center" type="String" uniqueMembers="false"/>
+    </Hierarchy>
+  </Dimension>
+
+  <Dimension type="StandardDimension" visible="true" name="Date Dimension">
+    <Hierarchy name="Date Hierarchy" visible="true" hasAll="true" primaryKey="date_id">
+      <Table name="dim_date"/>
+      <Level name="Year" visible="true" column="year" type="Numeric" levelType="Regular"/>
+      <Level name="Quarter" visible="true" column="quarter" type="Numeric" levelType="Regular"/>
+      <Level name="Month" visible="true" column="month" type="Numeric" levelType="Regular"/>
+      <Level name="Day" visible="true" column="day" type="Numeric" levelType="Regular"/>
+    </Hierarchy>
+  </Dimension>
+
+  <Dimension type="StandardDimension" visible="true" name="Interviewer Dimension">
+    <Hierarchy name="Interviewer Hierarchy" visible="true" hasAll="true" primaryKey="interviewer_id">
+      <Table name="dim_interviewer"/>
+      <Level name="Role" visible="true" column="role" type="String" uniqueMembers="false"/>
+      <Level name="Interviewer Name" visible="true" column="interviewer_name" type="String" uniqueMembers="false"/>
+    </Hierarchy>
+  </Dimension>
+
+  <Cube name="recruitment_process_cube" visible="true" cache="true" enabled="true">
+    <Table name="fact_applications"/>
+    <DimensionUsage name="Candidate Dimension" source="Candidate Dimension" foreignKey="candidate_id"/>
+    <DimensionUsage name="Location Dimension" source="Location Dimension" foreignKey="location_id"/>
+    <DimensionUsage name="Date Dimension" source="Date Dimension" foreignKey="tnc_date_id"/>
+    <Measure name="Application Count" column="application_count" aggregator="sum" formatString="#,##0" visible="true"/>
+    <Measure name="Logical Test Score" column="logical_test_score" aggregator="avg" formatString="#,##0.00" visible="true"/>
+  </Cube>
+
+  <Cube name="candidate_demographics_cube" visible="true" cache="true" enabled="true">
+    <Table name="fact_applications"/>
+    <DimensionUsage name="Candidate Dimension" source="Candidate Dimension" foreignKey="candidate_id"/>
+    <DimensionUsage name="Date Dimension" source="Date Dimension" foreignKey="tnc_date_id"/>
+    <Measure name="Application Count" column="application_count" aggregator="sum" formatString="#,##0" visible="true"/>
+    <Measure name="Logical Test Score" column="logical_test_score" aggregator="avg" formatString="#,##0.00" visible="true"/>
+  </Cube>
+
+  <Cube name="interview_analysis_cube" visible="true" cache="true" enabled="true">
+    <Table name="fact_interviews"/>
+    <DimensionUsage name="Candidate Dimension" source="Candidate Dimension" foreignKey="candidate_id"/>
+    <DimensionUsage name="Interviewer Dimension" source="Interviewer Dimension" foreignKey="interviewer_id"/>
+    <DimensionUsage name="Tech Interview Date" source="Date Dimension" foreignKey="tech_date_id"/>
+    <DimensionUsage name="Final Interview Date" source="Date Dimension" foreignKey="final_date_id"/>
+    <Measure name="Tech Interview Count" column="tech_interview_count" aggregator="sum" formatString="#,##0" visible="true"/>
+    <Measure name="Tech Interview Score" column="tech_interview_score" aggregator="avg" formatString="#,##0.00" visible="true"/>
+    <Measure name="Final Interview Count" column="final_interview_count" aggregator="sum" formatString="#,##0" visible="true"/>
+    <Measure name="Final Interview Score" column="final_interview_score" aggregator="avg" formatString="#,##0.00" visible="true"/>
+  </Cube>
+
+  <Cube name="application_by_location_cube" visible="true" cache="true" enabled="true">
+    <Table name="fact_applications"/>
+    <DimensionUsage name="Location Dimension" source="Location Dimension" foreignKey="location_id"/>
+    <DimensionUsage name="Date Dimension" source="Date Dimension" foreignKey="tnc_date_id"/>
+    <Measure name="Application Count" column="application_count" aggregator="sum" formatString="#,##0" visible="true"/>
+  </Cube>
+
+  <Parameter name="JdbcDrivers" defaultValue="com.mysql.jdbc.Driver"/>
+  <Parameter name="Jdbc" defaultValue="jdbc:mysql://localhost:3306/dwh"/>
+  <Parameter name="JdbcUser" defaultValue="root"/>
+  <Parameter name="JdbcPassword" defaultValue="password"/>
+
+</Schema>

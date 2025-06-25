@@ -1,0 +1,8 @@
+DataSource/recruitment_raw.csv
+DataSource/recruitment_db.sql
+
+Kettle/etl_recruitment_dimensi.ktr
+
+SchemaWorkbench/Schema.backup.xml
+
+*.pdf
